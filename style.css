@@ -1,0 +1,70 @@
+body {
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(to right, #000000, #1c1c1c);
+    color: gold;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+input[type="checkbox"] {
+    margin-left: 10px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: gold;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #ffd700;
+}
+
+.pairs-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.pair {
+    margin-bottom: 10px;
+}
+
+table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: #111;
+}
+
+th,
+td {
+    padding: 12px;
+    border: 1px solid gold;
+}
+
+th {
+    background: gold;
+    color: black;
+}
+
+td.gold {
+    background: gold;
+    color: black;
+    font-weight: bold;
+}

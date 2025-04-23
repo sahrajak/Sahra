@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>إحصائيات الفوز</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>إحصائيات الفوز</h1>
+<div id="champion">البطل الحالي: جاري الحساب...</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>اللاعب</th>
+      <th>عدد مرات الفوز</th>
+    </tr>
+  </thead>
+  <tbody id="statsTable">
+  </tbody>
+</table>
+
+<button onclick="goBack()">رجوع للرئيسية</button>
+
+<script type="module">
+  import { db, ref, get, child } from './firebase.js';
+
+  const players = ['يحيى', 'محمود', 'سلطان', 'محمد', 'عبدو', 'حسن'];
+
+  async function loadStats() {
+    const statsTable = document.getElementById('statsTable');
+    const championDiv = document.getElementById('champion');
+    const dbRef = ref(db);
+
+    const snapshot = await get(child(dbRef, 'votes'));
+    const playerWins = {};
+
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      Object.values(data).forEach(voteEntry => {
+        const roundVotes = voteEntry.players || [];
+        const pairCount = {};
+
+        roundVotes.forEach(vote => {
+          const sortedPair = vote.players.slice().sort();
+          const key = sortedPair.join('-');
+          pairCount[key] = (pairCount[key] || 0) + 1;
+        });
+
+        for (const pairKey in pairCount) {
+          if (pairCount[pairKey] >= 3) {
+            const [p1, p2] = pairKey.split('-');
+            playerWins[p1] = (playerWins[p1] || 0) + 1;
+            playerWins[p2] = (playerWins[p2] || 0) + 1;
+          }
+        }
+      });
+    }
+
+    const sortedStats = players.map(player => ({
+      name: player,
+      wins: playerWins[player] || 0
+    })).sort((a, b) => b.wins - a.wins);
+
+    const topPlayer = sortedStats[0];
+    if (topPlayer.wins > 0) {
+      championDiv.textContent = `البطل الحالي: ${topPlayer.name} (${topPlayer.wins} فوز)`;
+    } else {
+      championDiv.textContent = "لا يوجد بطل حتى الآن.";
+    }
+
+    statsTable.innerHTML = '';
+    sortedStats.forEach((player, idx) => {
+      statsTable.innerHTML += `
+        <tr>
+          <td class="${idx === 0 ? 'gold' : ''}">${player.name}</td>
+          <td class="${idx === 0 ? 'gold' : ''}">${player.wins}</td>
+        </tr>
+      `;
+    });
+  }
+
+  window.goBack = function() {
+    window.location.href = 'main.html';
+  }
+
+  loadStats();
+</script>
+
+</body>
+</html>

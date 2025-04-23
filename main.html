@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>جاكرو سهرة - التصويت</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>اختر الثنائي الأفضل</h1>
+  <div id="pairs" class="pairs-container"></div>
+  <button onclick="submitVote()">تصويت</button>
+  <button onclick="goStats()">عرض الإحصائيات</button>
+</div>
+
+<script type="module">
+  import { db, ref, push } from './firebase.js';
+
+  const players = ['يحيى', 'محمود', 'سلطان', 'محمد', 'عبدو', 'حسن'];
+  const selectedPairs = [];
+
+  function createPairs() {
+    const container = document.getElementById('pairs');
+    players.forEach((player1, idx) => {
+      for (let i = idx + 1; i < players.length; i++) {
+        const player2 = players[i];
+        const div = document.createElement('div');
+        div.className = 'pair';
+        div.innerHTML = `<input type="checkbox" value="${player1},${player2}"> ${player1} + ${player2}`;
+        container.appendChild(div);
+      }
+    });
+  }
+
+  window.submitVote = function() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    if (checkboxes.length === 0) {
+      alert('اختر زوجاً واحداً على الأقل.');
+      return;
+    }
+    const voteData = [];
+    checkboxes.forEach(cb => {
+      const [p1, p2] = cb.value.split(',');
+      voteData.push({ players: [p1, p2] });
+    });
+
+    const votesRef = ref(db, 'votes');
+    push(votesRef, { players: voteData });
+
+    alert('تم التصويت بنجاح!');
+    window.location.href = 'stats.html';
+  }
+
+  window.goStats = function() {
+    window.location.href = 'stats.html';
+  }
+
+  createPairs();
+</script>
+
+</body>
+</html>
